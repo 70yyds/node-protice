@@ -1,0 +1,114 @@
+* {
+	padding: 0;
+	margin: 0;
+}
+
+body,
+html {
+	background-color: #f0f0f0;
+}
+
+.head {
+	width: 100%;
+	height: 2.5rem;
+	line-height: 2.5rem;
+	text-align: center;
+	font-size: 1rem;
+	background-color: #f7f7f8;
+	border-bottom: 0.1rem solid #c8c8c8;
+	color: #000;
+}
+
+.content {
+	width: 95%;
+	margin: 1rem auto;
+	border-radius: 0.5rem;
+	background-color: #fff;
+	padding: 1rem;
+	box-sizing: border-box;
+
+}
+
+.content div {
+	width: 100%;
+	margin-bottom: 1rem;
+}
+
+.content div p {
+	width: 100%;
+	height: 1rem;
+	line-height: 1rem;
+	margin-bottom: 0.5rem;
+	font-size: 0.8rem;
+	color: #000;
+}
+
+.content div input ,.content div textarea{
+	width: 100%;
+	border: 1px solid #000;
+	height: 2rem;
+	border-radius: 0.4rem;
+	outline: none;
+	padding:0 0.5rem;
+	box-sizing: border-box;
+}
+.content div textarea{
+	height: 50px;
+	padding: 10px;
+	}
+#submit{
+	width: 100%;
+	    background-color: #fd6020;
+	    color: #fff;
+	    height: 2.5rem;
+	    border-radius: 2.5rem;
+	    margin-top: 0.5rem;
+	    font-size: 1rem;
+	    background-image: none;
+	    border: 1px solid #fd6020;
+}
+
+
+/* 上传图片 */
+.img_wrap{
+    width: 100%;
+	display: flex;
+	flex-wrap: wrap;
+    margin-bottom: 0 !important;
+}
+.img_wrap li{
+	width: 48%;
+    height: 8.5rem;
+	margin-bottom: 0.8rem;
+	position: relative;
+}
+.img_wrap li:nth-child(2n+1) {
+    margin-right: 4%;
+}
+.img_wrap li img:nth-child(1){
+	width: 100%;
+	height: 100% !important;
+}
+.img_wrap li img:nth-child(2){
+	width: 1.5rem;
+    height: 1.5rem;
+    position: absolute;
+    top: -0.7rem;
+    right: -0.7rem;
+}
+
+.img_upload_wrap{
+	width: 48% !important;
+    height: 8.5rem;
+	position: relative;
+}
+.img_upload_wrap img,.img_upload_wrap input{
+	width: 100%;
+	height: 100% !important;
+	position: absolute;
+	left: 0;
+	top: 0;
+}
+.img_upload_wrap input{
+	opacity: 0;
+}

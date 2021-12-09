@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+	<!-- 名字：视口；内容：宽=设备宽，初始缩放比例=1.0，用户缩放=不，最大缩放比例=1.0 -->
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0" />
+	<!-- x5(也就是在微信上）满屏，其他浏览器也满屏  -->
+	<meta name="full-screen" content="yes" />
+	<link rel="stylesheet" type="text/css" href="css/uploadImg.css" />
+	<link rel="stylesheet" type="text/css" href="css/index.css" />
+	<title>添加隐患</title>
+</head>
+
+<body>
+	<div>
+		<!-- <div class="head">添加隐患</div> -->
+		<div class="content">
+			<form action="" class="formWrap">
+				<div>
+					<p>学院</p>
+					<input type="text" id="college" placeholder="" disabled="disabled" />
+				</div>
+				<div>
+					<p>实验分室名称</p>
+					<input type="text" id="laboratory" placeholder="" disabled="disabled" />
+				</div>
+
+				<div>
+					<p>负责人</p>
+					<input type="text" id="principal" placeholder="" disabled="disabled" />
+				</div>
+				<div>
+					<p>负责人联系电话</p>
+					<input type="text" id="principalTel" placeholder="" disabled="disabled" />
+				</div>
+				<div>
+					<p>安全负责人</p>
+					<input type="text" id="contacts" placeholder="" disabled="disabled" />
+				</div>
+				<div>
+					<p>安全负责人联系电话</p>
+					<input type="text" id="contactsTel" placeholder="" disabled="disabled" />
+				</div>
+				<div>
+					<p>隐患内容</p>
+					<textarea rows="10" cols="" id="hiddenCon" placeholder=""></textarea>
+				</div>
+			</form>
+
+			<div class="upload-imgcontent">
+				<p>照片(最多上传三张)</p>
+				<div class="custom_img">
+					<ul class="img_wrap" id="img_wrap">
+					</ul>
+					<div class="img_upload_wrap" id="img_upload_wrap">
+						<img class="img_upload" src="img/upload_img.png" />
+						<input type="file" id="file_upload" oninput="changepic()"
+							accept="image/jpg,image/jpeg,image/png,image/PNG" />
+					</div>
+				</div>
+
+			</div>
+			<input type="submit" value="提交" id="submit">
+
+		</div>
+	</div>
+</body>
+
+</html>
+<script language="JavaScript" src="js/jquery.min.js"></script>
+<script language="JavaScript" src="js/base.js"></script>
+<script language="JavaScript" src="js/uploadImg.js"></script>
+<script type="text/javascript">
+	var imgUrl = [];
+	var imgNum = 0;
+	// 上传图片
+	function changepic() {
+		var file = $('#file_upload')[0].files[0]
+		var formData = new FormData();
+		formData.append("file", file);
+		$.ajax({
+			url: "http://api.safety.laboratory.shichengtech.com/api/app/eventHiddenDanger/uploadImage",
+			type: "post",
+			data: formData,
+			processData: false, // 告诉jQuery不要去处理发送的数据
+			contentType: false, // 告诉jQuery不要去设置Content-Type请求头
+			dataType: 'text',
+			success: function (data) {
+				var dataURL = JSON.parse(data)
+				$("#img_wrap").append("<li><img class='new_img' src=' " + dataURL.url + "  '/><img onclick=removeImge('" + dataURL.url + "') src='img/del_img.png' /></li>");
+				imgUrl.push({ 'code': dataURL.code, 'url': dataURL.url })
+				imgNum++;
+				if (imgNum == 3) {
+					$("#img_upload_wrap").css('display', 'none')
+				}
+			},
+			error: function (data) {
+
+			}
+		});
+	}
+	// 删除图片
+	function removeImge(itemUrl) {
+		for (var i = 0; i < $("#img_wrap li").length; i++) {
+			var imgSrc = $("#img_wrap li").eq(i).find('.new_img')[0].src
+			if (imgSrc == itemUrl) {
+				imgNum--;
+				if (imgNum < 3) {
+					$("#img_upload_wrap").css('display', 'block')
+				}
+				$("#img_wrap li").eq(i).remove();
+				$("#img_upload_wrap").find('input').val('');
+			}
+		}
+		var newImgUrl = []
+		for (var i = 0; i < imgUrl.length; i++) {
+			if (imgUrl[i].url != itemUrl) {
+				newImgUrl.push(imgUrl[i])
+			}
+		}
+		imgUrl = newImgUrl
+	}
+
+
+	$(function () {
+		// 获取参数
+		$.getUrlParam = function (name) {
+			var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+			var r = window.location.search.substr(1).match(reg);
+			if (r != null) return unescape(r[2]);
+			return null;
+		}
+		var branchGuid = $.getUrlParam('branchGuid')
+		var token = ''
+		var collegeGuid=''
+		// 登录
+		var info = {
+			username: 'public',
+			password: '888888',
+			grant_type: 'password',
+			client_id: 'SCWJ_Laboratory_App',
+			client_secret: 'scwj',
+		}
+		$.ajax({
+			url: "http://api.safety.laboratory.shichengtech.com/api/app/system/loginData",
+			type: "get",
+			dataType: "json",
+			success: function (res) {
+				console.log(res, 'rss')
+				$.ajax({
+					url: "http://api.safety.laboratory.shichengtech.com/connect/token",
+					type: "post",
+					dataType: "json",
+					data: info,
+					// 租户id
+					headers: { '__tenant': res.tenant.id },
+					success: function (res) {
+						token = 'Bearer ' + res.access_token
+						//  获取实验分室详情
+						$.ajax({
+							url: "http://api.safety.laboratory.shichengtech.com/api/app/laboratoryBranch/byGuid?guid=" + branchGuid,
+							type: "get",
+							headers: { 'Authorization': token },
+							success: function (res) {
+								collegeGuid=res.collegeGuid
+								$("#college").val(res.collegeName)
+								$("#laboratory").val(res.name)
+								let principalAll = []
+								res.responsible.map((item,index)=>{
+									principalAll.push(item.teacherName)
+								})
+								$("#principal").val(principalAll)
+								let principalTelAll = []
+								res.responsible.map((item,index)=>{
+									principalTelAll.push(item.phone)
+								})
+								$("#principalTel").val(principalTelAll)
+								let contactsAll = []
+								res.safetyResponsible.map((item,index)=>{
+									contactsAll.push(item.teacherName)
+								})
+								$("#contacts").val(contactsAll)
+								let contactsTelAll = []
+								res.safetyResponsible.map((item,index)=>{
+									contactsTelAll.push(item.phone)
+								})
+								$("#contactsTel").val(contactsTelAll)
+						
+							},
+							error: function (jqXHR) {
+							}
+						})
+					},
+					error: function (jqXHR) {
+					}
+				})
+			}
+		});
+		// 提交
+		$("#submit").click(function () {
+			if (token) {
+				//请求参数
+				var submitData = {
+					collegeGuid:collegeGuid,
+					branchGuid: branchGuid,
+					content: $("#hiddenCon").val(),
+					files: imgUrl
+				};
+				$.ajax({
+					url: "http://api.safety.laboratory.shichengtech.com/api/app/eventHiddenDanger",
+					type: "post",
+					headers: { 'Authorization': token },
+					contentType: "application/json",
+					dataType: "json",
+					data: JSON.stringify(submitData),
+					success: function (res) {
+						alert('提交成功')
+						window.location.reload()
+					},
+					error: function (jqXHR) {
+
+					}
+				});
+			} else {
+				alert('请稍后重试')
+			}
+
+		});
+	});
+</script>
