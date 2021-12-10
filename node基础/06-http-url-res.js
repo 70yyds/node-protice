@@ -2,7 +2,6 @@ const http = require('http')
 const fs = require('fs')
 //createserver 实例
 const server = http.createServer()
-
 server.on('request', (req, res) => {
 
 	console.log(req.url, req.method);
