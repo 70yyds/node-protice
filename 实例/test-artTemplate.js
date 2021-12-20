@@ -12,7 +12,7 @@ server.on('request', (req, res) => {
         console.log('error');
         return
       }
-      // data就是读到的文件的内容，这里只识别字符串，需要转换一下
+      // data就是读到的文件的内容，artTemplate这里只识别字符串，需要转换一下
       fs.readdir('../node基础', (err, files) => {
         //readdir读取文件目录
         if (err) {
